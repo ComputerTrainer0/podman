@@ -1,0 +1,20 @@
+sudo mkdir -p /etc/containers
+sudo tee /etc/containers/policy.json > /dev/null <<'EOF'
+{
+  "default": [
+    {
+      "type": "insecureAcceptAnything"
+    }
+  ]
+}
+EOF
+
+
+sudo tee /etc/containers/registries.conf > /dev/null <<'EOF'
+unqualified-search-registries = ["docker.io", "quay.io"]
+EOF
+
+
+podman run -d --name mynginx -p 8080:8080 docker.io/nginxinc/nginx-unprivileged:latest
+podman ps
+curl http://localhost:8080
