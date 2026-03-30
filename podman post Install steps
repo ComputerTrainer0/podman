@@ -11,10 +11,51 @@ EOF
 
 
 sudo tee /etc/containers/registries.conf > /dev/null <<'EOF'
+[[registry]]
 unqualified-search-registries = ["docker.io", "quay.io"]
+location = "35.153.133.45:5000"
+insecure = true
+
 EOF
 
 
 podman run -d --name mynginx -p 8080:8080 docker.io/nginxinc/nginx-unprivileged:latest
 podman ps
 curl http://localhost:8080
+
+
+
+#!/bin/bash
+
+REGISTRY="35.153.133.45:5000"
+
+IMAGES=(
+"docker.io/nginxinc/nginx-unprivileged:latest"
+"docker.io/library/nginx:latest"
+"docker.io/library/httpd:latest"
+"docker.io/library/busybox:latest"
+"docker.io/library/alpine:latest"
+"docker.io/library/registry:2"
+"docker.io/curlimages/curl:latest"
+"docker.io/polinux/stress:latest"
+"docker.io/library/mysql:latest"
+"docker.io/library/postgres:latest"
+"docker.io/library/redis"
+)
+
+for IMAGE in "${IMAGES[@]}"
+do
+    echo "======================================="
+    echo "Processing $IMAGE"
+
+    podman pull $IMAGE
+
+    NAME=$(echo $IMAGE | awk -F/ '{print $NF}')
+
+    podman tag $IMAGE $REGISTRY/$NAME
+
+    podman push $REGISTRY/$NAME
+
+done
+
+echo "✅ All images pushed successfully!"
