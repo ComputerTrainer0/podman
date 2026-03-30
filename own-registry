@@ -6,3 +6,8 @@ curl http://localhost:5000/v2/
 
 podman tag docker.io/nginxinc/nginx-unprivileged:latest \
 <EC2-IP>:5000/nginx-unprivileged:latest
+
+
+[[registry]]
+location = "35.153.133.45:5000"
+insecure = true
